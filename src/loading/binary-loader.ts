@@ -6,7 +6,7 @@ import { Box3, BufferAttribute, BufferGeometry, Uint8BufferAttribute, Vector3 } 
 import { PointAttributeName, PointAttributeType } from '../point-attributes';
 import { PointCloudOctreeGeometryNode } from '../point-cloud-octree-geometry-node';
 import { Version } from '../version';
-import { GetUrlFn, XhrRequest } from './types';
+import { XhrRequest } from './types';
 
 interface AttributeData {
   attribute: {
@@ -28,7 +28,6 @@ interface WorkerResponse {
 }
 
 interface BinaryLoaderOptions {
-  getUrl?: GetUrlFn;
   version: string;
   boundingBox: Box3;
   scale: number;
@@ -41,7 +40,6 @@ export class BinaryLoader {
   version: Version;
   boundingBox: Box3;
   scale: number;
-  getUrl: GetUrlFn;
   disposed: boolean = false;
   xhrRequest: XhrRequest;
   callbacks: Callback[];
@@ -49,7 +47,6 @@ export class BinaryLoader {
   private workers: Worker[] = [];
 
   constructor({
-    getUrl = s => Promise.resolve(s),
     version,
     boundingBox,
     scale,
@@ -62,7 +59,6 @@ export class BinaryLoader {
     }
 
     this.xhrRequest = xhrRequest;
-    this.getUrl = getUrl;
     this.boundingBox = boundingBox;
     this.scale = scale;
     this.callbacks = [];
@@ -80,7 +76,7 @@ export class BinaryLoader {
       return Promise.resolve();
     }
 
-    return Promise.resolve(this.getUrl(this.getNodeUrl(node)))
+    return Promise.resolve(this.getNodeUrl(node))
       .then(url => this.xhrRequest(url, { mode: 'cors' }))
       .then(res => res.arrayBuffer())
       .then(buffer => {

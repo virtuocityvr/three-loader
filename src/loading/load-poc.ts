@@ -55,11 +55,11 @@ export function loadPOC(
   return Promise.resolve(getUrl(url)).then(transformedUrl => {
     return xhrRequest(transformedUrl, { mode: 'cors' })
       .then(res => res.json())
-      .then(parse(transformedUrl, getUrl, xhrRequest));
+      .then(parse(transformedUrl, xhrRequest));
   });
 }
 
-function parse(url: string, getUrl: GetUrlFn, xhrRequest: XhrRequest) {
+function parse(transformedUrl: string, xhrRequest: XhrRequest) {
   return (data: POCJson): Promise<PointCloudOctreeGeometry> => {
     const { offset, boundingBox, tightBoundingBox } = getBoundingBoxes(data);
 
@@ -68,14 +68,12 @@ function parse(url: string, getUrl: GetUrlFn, xhrRequest: XhrRequest) {
 
     if (useLASLAZ) {
       loader = new LasLazLoader({
-        getUrl,
         version: data.version,
         extension: data.pointAttributes as string,
         xhrRequest
       });
     } else {
       loader = new BinaryLoader({
-        getUrl,
         version: data.version,
         boundingBox,
         scale: data.scale,
@@ -91,8 +89,8 @@ function parse(url: string, getUrl: GetUrlFn, xhrRequest: XhrRequest) {
     );
 
 
-    pco.url = url;
-    pco.octreeDir = data.octreeDir;
+    pco.octreeDir = data.octreeDir.indexOf('http') === 0 ? data.octreeDir : `${transformedUrl}/../${data.octreeDir}`;
+    pco.url = transformedUrl;
     pco.needsUpdate = true;
     pco.spacing = data.spacing;
     pco.hierarchyStepSize = data.hierarchyStepSize;
