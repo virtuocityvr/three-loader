@@ -1,43 +1,4 @@
-// let pointFormatReaders = {
-//	0: function(dv) {
-//		return {
-//			"position": [ dv.getInt32(0, true), dv.getInt32(4, true), dv.getInt32(8, true)],
-//			"intensity": dv.getUint16(12, true),
-//			"classification": dv.getUint8(16, true)
-//		};
-//	},
-//	1: function(dv) {
-//		return {
-//			"position": [ dv.getInt32(0, true), dv.getInt32(4, true), dv.getInt32(8, true)],
-//			"intensity": dv.getUint16(12, true),
-//			"classification": dv.getUint8(16, true)
-//		};
-//	},
-//	2: function(dv) {
-//		return {
-//			"position": [ dv.getInt32(0, true), dv.getInt32(4, true), dv.getInt32(8, true)],
-//			"intensity": dv.getUint16(12, true),
-//			"classification": dv.getUint8(16, true),
-//			"color": [dv.getUint16(20, true), dv.getUint16(22, true), dv.getUint16(24, true)]
-//		};
-//	},
-//	3: function(dv) {
-//		return {
-//			"position": [ dv.getInt32(0, true), dv.getInt32(4, true), dv.getInt32(8, true)],
-//			"intensity": dv.getUint16(12, true),
-//			"classification": dv.getUint8(16, true),
-//			"color": [dv.getUint16(28, true), dv.getUint16(30, true), dv.getUint16(32, true)]
-//		};
-//	}
-// };
-//
-//
-
 function readUsingTempArrays(event) {
-  if (!PRODUCTION) {
-    performance.mark('laslaz-start');
-  }
-
   let buffer = event.data.buffer;
   let numPoints = event.data.numPoints;
   let sourcePointSize = event.data.pointSize;
@@ -173,21 +134,6 @@ function readUsingTempArrays(event) {
     iIndices[i] = i;
   }
 
-  if (!PRODUCTION) {
-    performance.mark('laslaz-end');
-    performance.measure('laslaz', 'laslaz-start', 'laslaz-end');
-
-    let measure = performance.getEntriesByType('measure')[0];
-    let dpp = (1000 * measure.duration) / numPoints;
-    let debugMessage = `${measure.duration.toFixed(3)} ms, ${numPoints} points, ${dpp.toFixed(
-      3,
-    )} micros / point`;
-    console.log(debugMessage);
-
-    performance.clearMarks();
-    performance.clearMeasures();
-  }
-
   let message = {
     mean: mean,
     position: pBuff,
@@ -218,10 +164,6 @@ function readUsingTempArrays(event) {
 }
 
 function readUsingDataView(event) {
-  if (!PRODUCTION) {
-    performance.mark('laslaz-start');
-  }
-
   let buffer = event.data.buffer;
   let numPoints = event.data.numPoints;
   let sourcePointSize = event.data.pointSize;
@@ -326,20 +268,6 @@ function readUsingDataView(event) {
   let iIndices = new Uint32Array(indices);
   for (let i = 0; i < numPoints; i++) {
     iIndices[i] = i;
-  }
-
-  if (!PRODUCTION) {
-    performance.mark('laslaz-end');
-
-    //{ // print timings
-    //	performance.measure("laslaz", "laslaz-start", "laslaz-end");
-    //	let measure = performance.getEntriesByType("measure")[0];
-    //	let dpp = 1000 * measure.duration / numPoints;
-    //	let debugMessage = `${measure.duration.toFixed(3)} ms, ${numPoints} points, ${dpp.toFixed(3)} µs / point`;
-    //	console.log(debugMessage);
-    //}
-    performance.clearMarks();
-    performance.clearMeasures();
   }
 
   let message = {
