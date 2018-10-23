@@ -10,6 +10,7 @@ import { createChildAABB } from '../utils/bounds';
 import { getIndexFromName } from '../utils/utils';
 import { Version } from '../version';
 import { BinaryLoader } from './binary-loader';
+import { LasLazLoader } from './las-laz-loader';
 import { GetUrlFn, XhrRequest } from './types';
 
 interface BoundingBoxData {
@@ -28,7 +29,7 @@ interface POCJson {
   points: number;
   boundingBox: BoundingBoxData;
   tightBoundingBox?: BoundingBoxData;
-  pointAttributes: PointAttributeStringName[];
+  pointAttributes: 'LAS' | 'LAZ' | PointAttributeStringName[];
   spacing: number;
   scale: number;
   hierarchyStepSize: number;
@@ -62,14 +63,25 @@ function parse(url: string, getUrl: GetUrlFn, xhrRequest: XhrRequest) {
   return (data: POCJson): Promise<PointCloudOctreeGeometry> => {
     const { offset, boundingBox, tightBoundingBox } = getBoundingBoxes(data);
 
-    const loader = new BinaryLoader({
-      getUrl,
-      version: data.version,
-      boundingBox,
-      scale: data.scale,
-      xhrRequest,
-    });
+    let loader: BinaryLoader | LasLazLoader;
+    const useLASLAZ = data.pointAttributes === 'LAS' || data.pointAttributes === 'LAZ';
 
+    if (useLASLAZ) {
+      loader = new LasLazLoader({
+        getUrl,
+        version: data.version,
+        extension: data.pointAttributes as string,
+        xhrRequest
+      });
+    } else {
+      loader = new BinaryLoader({
+        getUrl,
+        version: data.version,
+        boundingBox,
+        scale: data.scale,
+        xhrRequest
+      });
+    }
     const pco = new PointCloudOctreeGeometry(
       loader,
       boundingBox,
@@ -78,6 +90,7 @@ function parse(url: string, getUrl: GetUrlFn, xhrRequest: XhrRequest) {
       xhrRequest,
     );
 
+
     pco.url = url;
     pco.octreeDir = data.octreeDir;
     pco.needsUpdate = true;
@@ -85,7 +98,10 @@ function parse(url: string, getUrl: GetUrlFn, xhrRequest: XhrRequest) {
     pco.hierarchyStepSize = data.hierarchyStepSize;
     pco.projection = data.projection;
     pco.offset = offset;
-    pco.pointAttributes = new PointAttributes(data.pointAttributes);
+
+    if (!useLASLAZ) {
+      pco.pointAttributes = new PointAttributes(data.pointAttributes as PointAttributeStringName[]);
+    }
 
     const nodes: Record<string, PointCloudOctreeGeometryNode> = {};
 
