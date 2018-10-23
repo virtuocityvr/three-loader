@@ -34,12 +34,9 @@
   },
   "devDependencies": {
     "@babel/core": "^7.1.2",
-    "@babel/preset-env": "^7.1.0",
     "@types/node": "^10.11.3",
     "@types/three": "^0.92.23",
-    "babel-core": "^6.26.3",
     "babel-loader": "^8.0.4",
-    "babel-preset-env": "^1.7.0",
     "circular-dependency-plugin": "^5.0.2",
     "css-loader": "^1.0.0",
     "html-loader": "^0.5.5",
