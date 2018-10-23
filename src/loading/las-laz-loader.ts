@@ -6,7 +6,7 @@ import { Box3, BufferAttribute, BufferGeometry, Vector3 } from 'three';
 import { PointCloudOctreeGeometryNode } from '../point-cloud-octree-geometry-node';
 import { LASDecoder, LASFile } from './laslaz';
 import { Version } from '../version';
-import { GetUrlFn, XhrRequest } from './types';
+import { XhrRequest } from './types';
 
 /**
  * laslaz code taken and adapted from plas.io js-laslaz
@@ -18,7 +18,6 @@ import { GetUrlFn, XhrRequest } from './types';
  */
 
 interface LASLAZLoaderOptions {
-  getUrl?: GetUrlFn;
   version: string;
   extension: string;
   xhrRequest: XhrRequest;
@@ -32,7 +31,6 @@ interface LASData {
 
 export class LasLazLoader {
   version: Version;
-  getUrl: GetUrlFn;
   extension: string;
   disposed: boolean = false;
   xhrRequest: XhrRequest;
@@ -41,7 +39,6 @@ export class LasLazLoader {
   private workers: Worker[] = [];
 
   constructor ({
-    getUrl = s => Promise.resolve(s),
     version,
     xhrRequest,
     extension,
@@ -53,7 +50,6 @@ export class LasLazLoader {
     }
 
     this.xhrRequest = xhrRequest;
-    this.getUrl = getUrl;
     this.extension = extension.toLowerCase();
     this.callbacks = [];
   }
@@ -75,7 +71,7 @@ export class LasLazLoader {
       return Promise.resolve();
     }
 
-    return Promise.resolve(this.getUrl(this.getNodeUrl(node)))
+    return Promise.resolve(this.getNodeUrl(node))
       .then(url => this.xhrRequest(url, { mode: 'cors' }))
       .then(res => res.arrayBuffer())
       .then(buffer => this.parse(node, buffer));
