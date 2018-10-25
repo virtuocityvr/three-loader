@@ -9,6 +9,7 @@ import {
   NearestFilter,
   NoBlending,
   Object3D,
+  OrthographicCamera,
   PerspectiveCamera,
   Points,
   Ray,
@@ -240,12 +241,16 @@ export class PointCloudOctree extends PointCloudTree {
   updateMaterial(
     material: PointCloudMaterial,
     visibleNodes: PointCloudOctreeNode[],
-    camera: PerspectiveCamera,
+    camera: PerspectiveCamera | OrthographicCamera,
     renderer: WebGLRenderer,
   ): void {
     const maxScale = Math.max(this.scale.x, this.scale.y, this.scale.z);
 
-    material.fov = camera.fov * (Math.PI / 180);
+    if (camera instanceof PerspectiveCamera) {
+      material.fov = camera.fov * (Math.PI / 180);
+    } else {
+      material.fov = 75 * Math.PI / 180;
+    }
     material.screenWidth = renderer.domElement.clientWidth;
     material.screenHeight = renderer.domElement.clientHeight;
     material.near = camera.near;
