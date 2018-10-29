@@ -17,7 +17,6 @@ import {
   Scene,
   Sphere,
   Vector3,
-  WebGLProgram,
   WebGLRenderer,
   WebGLRenderTarget,
 } from 'three';
@@ -160,45 +159,33 @@ export class PointCloudOctree extends PointCloudTree {
 
   private makeOnBeforeRender(node: PointCloudOctreeNode) {
     return (
-      renderer: WebGLRenderer,
+      _: WebGLRenderer,
       _scene: Scene,
       _camera: Camera,
       _geometry: Geometry | BufferGeometry,
       material: Material,
     ) => {
-      const program = (material as any).program as WebGLProgram;
-      if (program === undefined) {
-        return;
-      }
 
-      const ctx = renderer.getContext();
-      ctx.useProgram(program.program);
-
-      const uniformsMap = (program.getUniforms() as any).map;
       const materialUniforms = (material as PointCloudMaterial).uniforms;
 
-      if (uniformsMap.level !== undefined) {
+      if (materialUniforms.level !== undefined) {
         const level = node.level;
         materialUniforms.level.value = level;
-        uniformsMap.level.setValue(ctx, level);
       }
 
-      if (uniformsMap.isLeafNode !== undefined) {
+      if (materialUniforms.isLeafNode !== undefined) {
         const isLeafNode = node.isLeafNode;
-        uniformsMap.isLeafNode.setValue(ctx, isLeafNode);
         materialUniforms.isLeafNode.value = isLeafNode;
       }
 
       const vnStart = this.visibleNodeTextureOffsets.get(node.name);
-      if (vnStart !== undefined && uniformsMap.vnStart !== undefined) {
-        materialUniforms.vnStart.value = vnStart;
-        uniformsMap.vnStart.setValue(ctx, vnStart);
+     if (vnStart !== undefined && materialUniforms.vnStart !== undefined) {
+        materialUniforms.vnStart.value = vnStart || 0;
       }
 
-      if (uniformsMap.pcIndex !== undefined) {
+      if (materialUniforms.pcIndex !== undefined) {
         const i = node.pcIndex ? node.pcIndex : this.visibleNodes.indexOf(node);
         materialUniforms.pcIndex.value = i;
-        uniformsMap.pcIndex.setValue(ctx, i);
       }
     };
   }
