@@ -1,5 +1,5 @@
 {
-  "name": "@pnext/three-loader",
+  "name": "three-potree-loader",
   "private": false,
   "version": "0.0.9",
   "description": "Potree loader for ThreeJS, converted and adapted to Typescript.",
