@@ -1,7 +1,7 @@
 //let LASModuleWasLoaded: boolean;
 
 export class LASFile {
-  constructor(ArrayBuffer);
+  constructor(a: ArrayBuffer);
   determineFormat: any;
   determineVersion: any;
   versionAsString: string;
@@ -19,13 +19,13 @@ export class LASLoader {
   getHeader: any;
   readData: any;
   close: any;
-};
+}
 export class LAZLoader {
   open: any;
   getHeader: any;
   readData: any;
   close: any;
-};
+}
 export class LASDecoder {
   constructor(arrayb: ArrayBuffer, pointFormatID: any, pointSize: any, pointsCount: number, scale: any, offset: any, mins: any, maxs: any);
   getPoint: any;
