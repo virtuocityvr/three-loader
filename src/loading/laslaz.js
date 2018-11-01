@@ -166,7 +166,7 @@ const getWorker = function() {
     return worker;
   }
 
-  const ctor = require('worker-loader!../workers/LASLAZWorker.js');
+  const ctor = require('../workers/LASLAZWorker.js');
   return new ctor();
 }
 
