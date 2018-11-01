@@ -174,7 +174,7 @@ export class LasLazLoader {
       return worker;
     }
 
-    const ctor = require('worker-loader!../workers/LASDecoderWorker.js');
+    const ctor = require('../workers/LASDecoderWorker.js');
     return new ctor();
   }
 

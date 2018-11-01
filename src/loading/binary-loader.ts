@@ -159,7 +159,7 @@ export class BinaryLoader {
       return worker;
     }
 
-    const ctor = require('worker-loader?inline!../workers/binary-decoder-worker.js');
+    const ctor = require('../workers/binary-decoder-worker.js');
     return new ctor();
   }
 
