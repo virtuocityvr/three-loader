@@ -4,6 +4,7 @@ export class LASFile {
   constructor(a: ArrayBuffer);
   determineFormat: any;
   determineVersion: any;
+  setLoader: any;
   versionAsString: string;
   open: any;
   getHeader: any;
