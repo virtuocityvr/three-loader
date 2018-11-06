@@ -94,12 +94,14 @@ export class LasLazLoader {
     const lf = new LASFile(buffer);
 
 
-    lf.open()
+    Promise.resolve()
     .then( () => {
+        return lf.setLoader();
+      }).then( () => {
+        return lf.open()
+    }).then( () => {
       lf.isOpen = true;
       return lf;
-    }).catch( () => {
-      console.log('failed to open file. :(');
     }).then( (lf: LASFile) => {
       return lf.getHeader().then(function (h: any) {
         return [lf, h];
@@ -159,6 +161,10 @@ export class LasLazLoader {
         }
         throw e;
       });
+    })
+    .catch( (e) => {
+        console.log(e);
+        console.log('failed to open file. :(');
     });
   }
 

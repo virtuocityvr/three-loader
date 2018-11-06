@@ -29,6 +29,12 @@ module.exports = {
         loader: 'babel-loader',
       },
       {
+        test: /orker\.js$/,
+        use: {
+          loader: 'worker-loader',
+        }
+      },
+      {
         test: /\.tsx?$/,
         loader: 'ts-loader',
         exclude: /node_modules/,
@@ -50,6 +56,7 @@ module.exports = {
         test: /\.css$/,
         use: ['style-loader', 'css-loader'],
       },
+
     ],
   },
   plugins: [new HtmlWebpackPlugin()],

@@ -160,14 +160,34 @@ LASLoader.prototype.close = function() {
 // WORKER POOL
 // --------------------
 let workers = [];
-const getWorker = function() {
+let workers_created = 0;
+const getWorker = function(res) {
   let worker = workers.pop();
   if (worker) {
-    return worker;
+      if (res) {
+          return res(worker);
+      } else {
+          return Promise.resolve(worker);
+      }
+  }
+
+  if (workers_created >= 5) {
+      // awaiting a free worker because 5 were already created
+      if (res) {
+          setTimeout( () => {
+              getWorker(res);
+          }, 30);
+          return;
+      } else {
+          return new Promise( (res) => {
+              getWorker(res)
+          });
+      }
   }
 
   const ctor = require('../workers/LASLAZWorker.js');
-  return new ctor();
+  workers_created += 1;
+  return Promise.resolve(new ctor());
 }
 
 const releaseWorker = function(worker) {
@@ -179,10 +199,10 @@ const releaseWorker = function(worker) {
 // LAZ Loader
 // Uses compiled worker module to load LAZ files
 //
-var LAZLoader = function(arraybuffer) {
+var LAZLoader = function(arraybuffer, worker) {
   this.arraybuffer = arraybuffer;
 
-  this.ww = getWorker();
+  this.ww = worker;
 
   this.nextCB = null;
   var o = this;
@@ -270,10 +290,20 @@ var LASFile = function(arraybuffer) {
   this.determineFormat();
   if (pointFormatReaders[this.formatId] === undefined)
     throw new Error("The point format ID is not supported");
+};
 
-  this.loader = this.isCompressed ?
-    new LAZLoader(this.arraybuffer) :
-    new LASLoader(this.arraybuffer);
+LASFile.prototype.setLoader = async function() {
+  return new Promise( (res, rej) => {
+      if (this.isCompressed) {
+          getWorker().then( (worker) => {
+            this.loader = new LAZLoader(this.arraybuffer, worker);
+            res();
+          });
+      } else {
+        this.loader = new LASLoader(this.arraybuffer);
+        setTimeout(res, 0);
+      }
+  });
 };
 
 LASFile.prototype.determineFormat = function() {
