@@ -8,6 +8,52 @@ import { LASDecoder, LASFile } from './laslaz';
 import { Version } from '../version';
 import { XhrRequest } from './types';
 
+// WORKER POOL
+// --------------------
+let workers: Worker[] = [];
+let workers_created = 0;
+let disposed = false;
+
+function releaseWorker(worker: Worker): void {
+  workers.push(worker);
+}
+
+function getWorker(): Promise<Worker> {
+  return new Promise( (resolve) => {
+    waitForWorker(resolve);
+  });
+}
+
+function waitForWorker(resolve: any) {
+  const worker = workers.pop();
+  if (worker) {
+    return resolve(worker);
+  }
+
+  if (workers_created >= 5) {
+    // awaiting a free worker because 5 were already created
+    setTimeout( () => {
+      waitForWorker(resolve);
+    }, 30);
+    return;
+  }
+
+  const LASDecoderWorker = require('../workers/LASDecoderWorker.js');
+  workers_created += 1;
+  return resolve(new LASDecoderWorker());
+}
+
+
+function dispose(): void {
+  workers.forEach(worker => worker.terminate());
+  workers = [];
+  workers_created = 0;
+
+  disposed = true;
+}
+
+
+
 /**
  * laslaz code taken and adapted from plas.io js-laslaz
  *	http://plas.io/
@@ -35,8 +81,6 @@ export class LasLazLoader {
   disposed: boolean = false;
   xhrRequest: XhrRequest;
 
-  private workers: Worker[] = [];
-
   constructor ({
     version,
     xhrRequest,
@@ -52,12 +96,7 @@ export class LasLazLoader {
     this.extension = extension.toLowerCase();
   }
 
-  dispose(): void {
-    this.workers.forEach(worker => worker.terminate());
-    this.workers = [];
-
-    this.disposed = true;
-  }
+  dispose() : void { }
 
   // @ts-ignore
   static progressCB (p: number) {
@@ -168,23 +207,9 @@ export class LasLazLoader {
     });
   }
 
-  releaseWorker(worker: Worker): void {
-    this.workers.push(worker);
-  }
+  private async pushBatch(node: PointCloudOctreeGeometryNode, lasBuffer: LASDecoder) {
 
-  private getWorker(): Worker {
-    const worker = this.workers.pop();
-    if (worker) {
-      return worker;
-    }
-
-    const ctor = require('../workers/LASDecoderWorker.js');
-    return new ctor();
-  }
-
-  private pushBatch(node: PointCloudOctreeGeometryNode, lasBuffer: LASDecoder) {
-
-    const worker = this.getWorker();
+    const worker = await getWorker();
 
     worker.onmessage = (e) => {
         const geometry = new BufferGeometry();
@@ -227,7 +252,7 @@ export class LasLazLoader {
 
         //debugger;
 
-        this.releaseWorker(worker);
+        releaseWorker(worker);
     };
 
     const message = {
