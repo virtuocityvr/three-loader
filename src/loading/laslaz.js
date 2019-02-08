@@ -185,9 +185,9 @@ const getWorker = function(res) {
       }
   }
 
-  const ctor = require('../workers/LASLAZWorker.js');
+  const LASLAZWorker = require('../workers/LASLAZWorker.js');
   workers_created += 1;
-  return Promise.resolve(new ctor());
+  return Promise.resolve(new LASLAZWorker());
 }
 
 const releaseWorker = function(worker) {
@@ -270,7 +270,7 @@ LAZLoader.prototype.close = function() {
   return new Promise(function(res, rej) {
     o.dorr({type:'close'}, function(r) {
               releaseWorker(o.ww);
-    
+
       if (r.status !== 1)
         return rej(new Error("Failed to close file"));
 
