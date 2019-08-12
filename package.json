@@ -25,7 +25,6 @@
     "prettier": "prettier --write \"**/*.js\" \"**/*.jsx\" \"**/*.tsx\" \"**/*.ts\"",
     "prepare-release": "standard-version"
   },
-  "dependencies": {},
   "peerDependencies": {
     "three": "^0.120.1"
   },
