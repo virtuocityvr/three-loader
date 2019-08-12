@@ -25,7 +25,9 @@
     "prettier": "prettier --write \"**/*.js\" \"**/*.jsx\" \"**/*.tsx\" \"**/*.ts\"",
     "prepare-release": "standard-version"
   },
-  "dependencies": {},
+  "dependencies": {
+    "@babel/core": "7.5.5"
+  },
   "peerDependencies": {
     "three": "^0.107.0"
   },

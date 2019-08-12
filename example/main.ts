@@ -40,7 +40,7 @@ loadBtn.addEventListener('click', () => {
     .load(
       'cloud.js',
       //'https://raw.githubusercontent.com/potree/potree/develop/pointclouds/lion_takanawa/',
-      'http://192.168.100.110:8000/pointclouds/Lantana_Heights/colorised/1e91e156-4a1d-4c0d-b351-1b4f7716669e/',
+      'http://localhost:8000/pointclouds/Lantana_Heights/colorised/1e91e156-4a1d-4c0d-b351-1b4f7716669e/',
     )
     .then(pco => {
       let group = new Group();
