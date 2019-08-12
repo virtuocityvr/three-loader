@@ -25,17 +25,13 @@
     "prettier": "prettier --write \"**/*.js\" \"**/*.jsx\" \"**/*.tsx\" \"**/*.ts\"",
     "prepare-release": "standard-version"
   },
-  "dependencies": {},
   "peerDependencies": {
     "three": "^0.111.0"
   },
   "devDependencies": {
     "@babel/core": "^7.7.5",
-    "@babel/preset-env": "^7.7.6",
     "@types/node": "^12.12.14",
-    "babel-core": "^6.26.3",
     "babel-loader": "^8.0.6",
-    "babel-preset-env": "^1.7.0",
     "circular-dependency-plugin": "^5.2.0",
     "css-loader": "^3.2.1",
     "html-loader": "^0.5.5",
