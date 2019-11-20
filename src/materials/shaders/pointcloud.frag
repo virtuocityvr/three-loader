@@ -242,5 +242,10 @@ void main() {
 		#if defined(use_edl)
 			gl_FragColor.a = vLogDepth;
 		#endif
-	#endif	
+	#endif
+
+	#if defined(grayscale)
+		float gray = dot(gl_FragColor.rgb, vec3(0.299, 0.587, 0.114));
+		gl_FragColor = vec4(vec3(gray), gl_FragColor.a);
+	#endif
 }
