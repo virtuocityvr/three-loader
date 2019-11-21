@@ -142,6 +142,7 @@ export class PointCloudMaterial extends RawShaderMaterial {
   fog = false;
   numClipBoxes: number = 0;
   clipBoxes: IClipBox[] = [];
+  subtractiveBlending = false;
   visibleNodesTexture: Texture | undefined;
   private visibleNodeTextureOffsets = new Map<string, number>();
 
@@ -332,6 +333,13 @@ export class PointCloudMaterial extends RawShaderMaterial {
       this.depthTest = true;
       this.depthWrite = false;
       this.depthFunc = LessEqualDepth;
+    }
+
+    if (this.subtractiveBlending) {
+      this.blending = CustomBlending;
+      this.blendEquation = ReverseSubtractEquation;
+      this.blendSrc = SrcAlphaFactor;
+      this.blendDst = OneFactor;
     }
 
     this.needsUpdate = true;
