@@ -14,6 +14,10 @@ import {
   Texture,
   Vector3,
   WebGLRenderer,
+  CustomBlending,
+  ReverseSubtractEquation,
+  SrcAlphaFactor,
+  OneFactor,
 } from 'three';
 import {
   DEFAULT_MAX_POINT_SIZE,
