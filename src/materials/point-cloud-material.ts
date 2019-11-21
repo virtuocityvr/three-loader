@@ -131,6 +131,7 @@ export class PointCloudMaterial extends RawShaderMaterial {
   fog = false;
   numClipBoxes: number = 0;
   clipBoxes: IClipBox[] = [];
+  subtractiveBlending = false;
   readonly visibleNodesTexture: Texture;
 
   private _gradient = SPECTRAL;
@@ -229,6 +230,7 @@ export class PointCloudMaterial extends RawShaderMaterial {
   @requiresShaderUpdate() treeType: TreeType = TreeType.OCTREE; // prettier-ignore
   @requiresShaderUpdate() pointOpacityType: PointOpacityType = PointOpacityType.FIXED; // prettier-ignore
   @requiresShaderUpdate() useFilterByNormal: boolean = false; // prettier-ignore
+  @requiresShaderUpdate() grayscale: boolean = false; // prettier-ignore
 
   attributes = {
     position: { type: 'fv', value: [] },
@@ -291,6 +293,13 @@ export class PointCloudMaterial extends RawShaderMaterial {
       this.depthFunc = LessEqualDepth;
     }
 
+    if (this.subtractiveBlending) {
+      this.blending = CustomBlending;
+      this.blendEquation = ReverseSubtractEquation;
+      this.blendSrc = SrcAlphaFactor;
+      this.blendDst = OneFactor;
+    }
+
     this.needsUpdate = true;
   }
 
@@ -337,6 +346,10 @@ export class PointCloudMaterial extends RawShaderMaterial {
 
     define('MAX_POINT_LIGHTS 0');
     define('MAX_DIR_LIGHTS 0');
+    
+    if (this.grayscale) {
+      define('grayscale');
+    }
 
     parts.push(shaderSrc);
 
