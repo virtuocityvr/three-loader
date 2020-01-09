@@ -72,6 +72,8 @@ export interface IPointCloudMaterialUniforms {
   toModel: IUniform<number[]>;
   transition: IUniform<number>;
   uColor: IUniform<Color>;
+  verticalRange1: IUniform<[number, number]>;
+  verticalRange2: IUniform<[number, number]>;
   visibleNodes: IUniform<Texture>;
   vnStart: IUniform<number>;
   wClassification: IUniform<number>;
@@ -180,6 +182,8 @@ export class PointCloudMaterial extends RawShaderMaterial {
     toModel: makeUniform('Matrix4f', []),
     transition: makeUniform('f', 0.5),
     uColor: makeUniform('c', new Color(0xffffff)),
+    verticalRange1: makeUniform('fv', [0.0, 1.0] as [number, number]),
+    verticalRange2: makeUniform('fv', [-0.5, 1.2] as [number, number]),
     visibleNodes: makeUniform('t', this.visibleNodesTexture),
     vnStart: makeUniform('f', 0.0),
     wClassification: makeUniform('f', 0),
@@ -215,6 +219,8 @@ export class PointCloudMaterial extends RawShaderMaterial {
   @uniform('spacing') spacing!: number; // prettier-ignore
   @uniform('transition') transition!: number; // prettier-ignore
   @uniform('uColor') color!: Color; // prettier-ignore
+  @uniform('verticalRange1') verticalRange1!: [number, number]; // prettier-ignore
+  @uniform('verticalRange2') verticalRange2!: [number, number]; // prettier-ignore
   @uniform('wClassification') weightClassification!: number; // prettier-ignore
   @uniform('wElevation') weightElevation!: number; // prettier-ignore
   @uniform('wIntensity') weightIntensity!: number; // prettier-ignore
@@ -235,6 +241,7 @@ export class PointCloudMaterial extends RawShaderMaterial {
   @requiresShaderUpdate() pointOpacityType: PointOpacityType = PointOpacityType.FIXED; // prettier-ignore
   @requiresShaderUpdate() useFilterByNormal: boolean = false; // prettier-ignore
   @requiresShaderUpdate() grayscale: boolean = false; // prettier-ignore
+  @requiresShaderUpdate() dualVerticalRangeHighlight: boolean = false; // prettier-ignore
 
   attributes = {
     position: { type: 'fv', value: [] },
@@ -353,6 +360,10 @@ export class PointCloudMaterial extends RawShaderMaterial {
     
     if (this.grayscale) {
       define('grayscale');
+    }
+
+    if (this.dualVerticalRangeHighlight) {
+      define('dual_vertical_range_highlight');
     }
 
     parts.push(shaderSrc);
