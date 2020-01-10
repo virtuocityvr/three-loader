@@ -515,9 +515,9 @@ void main() {
 
         vec3 LuminanceWeights = vec3(0.299,0.587,0.114);
         float luminance = dot(vColor,LuminanceWeights);
-        if (insideRange1) {
+        if (insideRange2) {
             vColor = getSaturatedColor(vec3(1.0, 0.8196, 0.0), luminance*1.1, 0.5);
-        } else if (insideRange2) {
+        } else if (insideRange1) {
             vColor = getSaturatedColor(vec3(0.2, 0.5843, 1.0), luminance, 0.5);
         } else {
             vColor = getSaturatedColor(vColor, luminance, 0.2);
