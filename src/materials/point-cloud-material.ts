@@ -81,6 +81,8 @@ export interface IPointCloudMaterialUniforms {
   toModel: IUniform<number[]>;
   transition: IUniform<number>;
   uColor: IUniform<Color>;
+  verticalRange1: IUniform<[number, number]>;
+  verticalRange2: IUniform<[number, number]>;
   visibleNodes: IUniform<Texture>;
   vnStart: IUniform<number>;
   wClassification: IUniform<number>;
@@ -192,7 +194,8 @@ export class PointCloudMaterial extends RawShaderMaterial {
     toModel: makeUniform('Matrix4f', []),
     transition: makeUniform('f', 0.5),
     uColor: makeUniform('c', new Color(0xffffff)),
-    // @ts-ignore
+    verticalRange1: makeUniform('fv', [0.0, 1.0] as [number, number]),
+    verticalRange2: makeUniform('fv', [-0.5, 1.2] as [number, number]),
     visibleNodes: makeUniform('t', this.visibleNodesTexture || new Texture()),
     vnStart: makeUniform('f', 0.0),
     wClassification: makeUniform('f', 0),
@@ -235,6 +238,8 @@ export class PointCloudMaterial extends RawShaderMaterial {
   @uniform('wSourceID') weightSourceID!: number;
   @uniform('opacityAttenuation') opacityAttenuation!: number;
   @uniform('filterByNormalThreshold') filterByNormalThreshold!: number;
+  @uniform('verticalRange1') verticalRange1!: [number, number];
+  @uniform('verticalRange2') verticalRange2!: [number, number];
 
   @requiresShaderUpdate() useClipBox: boolean = false;
   @requiresShaderUpdate() weighted: boolean = false;
@@ -247,6 +252,7 @@ export class PointCloudMaterial extends RawShaderMaterial {
   @requiresShaderUpdate() pointOpacityType: PointOpacityType = PointOpacityType.FIXED;
   @requiresShaderUpdate() useFilterByNormal: boolean = false;
   @requiresShaderUpdate() grayscale: boolean = false;
+  @requiresShaderUpdate() dualVerticalRangeHighlight: boolean = false;
 
   attributes = {
     position: { type: 'fv', value: [] },
@@ -395,6 +401,10 @@ export class PointCloudMaterial extends RawShaderMaterial {
     
     if (this.grayscale) {
       define('grayscale');
+    }
+
+    if (this.dualVerticalRangeHighlight) {
+      define('dual_vertical_range_highlight');
     }
 
     parts.push(shaderSrc);
