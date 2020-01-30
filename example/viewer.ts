@@ -78,6 +78,9 @@ export class Viewer {
     this.camera.lookAt(new Vector3());
     this.cameraControls = new OrbitControls(this.camera, this.perspectiveViewEl);
 
+    this.materialOpaque.dualVerticalRangeHighlight = true;
+    this.materialOpaque.verticalRange1 = [0.2, 0.3];
+    this.materialOpaque.verticalRange2 = [-0.5, 0];
     this.materialOpaque.size = 0.1;
     this.materialOpaque.pointColorType = PointColorType.RGB;
     // adaptive point size doesn't work because of a bug with LOD when rendering multiple times during a frame

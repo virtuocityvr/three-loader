@@ -28,6 +28,11 @@ uniform float spacing;
 uniform float near;
 uniform float far;
 
+#if defined dual_vertical_range_highlight
+	uniform vec2 verticalRange1;
+	uniform vec2 verticalRange2;
+#endif
+
 #if defined use_clip_box
 	uniform mat4 clipBoxes[max_clip_boxes];
 #endif
@@ -370,6 +375,14 @@ vec3 getCompositeColor() {
 	return c;
 }
 
+vec3 getSaturatedColor(vec3 color, float luminance, float saturation) {
+    return vec3(
+        mix(luminance, color.r, saturation),
+        mix(luminance, color.g, saturation),
+        mix(luminance, color.b, saturation)
+    );
+}
+
 void main() {
 	vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
 
@@ -490,11 +503,32 @@ void main() {
 		}
 	#endif
 
+   	// ---------------------
+	// Y RANGE HIGHLIGHT
+	// ---------------------
+
+     #if defined dual_vertical_range_highlight
+        vec4 world = modelMatrix * vec4( position, 1.0 );
+
+        bool insideRange1 = verticalRange1[0] <= world.y && world.y <= verticalRange1[1];
+        bool insideRange2 = verticalRange2[0] <= world.y && world.y <= verticalRange2[1];
+
+        vec3 LuminanceWeights = vec3(0.299,0.587,0.114);
+        float luminance = dot(vColor,LuminanceWeights);
+        if (insideRange2) {
+            vColor = getSaturatedColor(vec3(1.0, 0.8196, 0.0), luminance*1.1, 0.5);
+        } else if (insideRange1) {
+            vColor = getSaturatedColor(vec3(0.2, 0.5843, 1.0), luminance, 0.5);
+        } else {
+            vColor = getSaturatedColor(vColor, luminance, 0.2);
+        }
+    #endif
+
 	// ---------------------
 	// CLIPPING
 	// ---------------------
 
-	#if defined use_clip_box
+	#if defined(use_clip_box) && !defined(dual_vertical_range_highlight)
 		bool insideAny = false;
 		for (int i = 0; i < max_clip_boxes; i++) {
 			if (i == int(clipBoxCount)) {
