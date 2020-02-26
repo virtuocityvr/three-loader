@@ -1,4 +1,5 @@
 import { Group } from 'three';
+import { PointCloudOctree } from '../src';
 import { Viewer } from './viewer';
 
 require('./main.css');
@@ -14,6 +15,7 @@ document.body.appendChild(perspectiveViewEl);
 const viewer = new Viewer();
 viewer.initialize(topViewEl, perspectiveViewEl);
 
+let pointCloud: PointCloudOctree | undefined;
 let loaded: boolean = false;
 
 const unloadBtn = document.createElement('button');
