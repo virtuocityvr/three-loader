@@ -196,6 +196,7 @@ export class PointCloudMaterial extends RawShaderMaterial {
     uColor: makeUniform('c', new Color(0xffffff)),
     verticalRange1: makeUniform('fv', [0.0, 1.0] as [number, number]),
     verticalRange2: makeUniform('fv', [-0.5, 1.2] as [number, number]),
+    // @ts-ignore
     visibleNodes: makeUniform('t', this.visibleNodesTexture || new Texture()),
     vnStart: makeUniform('f', 0.0),
     wClassification: makeUniform('f', 0),

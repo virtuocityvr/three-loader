@@ -1,5 +1,5 @@
 const canvas = document.createElement('canvas');
-const gl: WebGLRenderingContext | null = canvas.getContext('webgl');
+const gl: WebGLRenderingContext | null = canvas.getContext('webgl') as WebGLRenderingContext;
 
 export const FEATURES = {
   SHADER_INTERPOLATION: hasExtension('EXT_frag_depth') && hasMinVaryingVectors(8),
