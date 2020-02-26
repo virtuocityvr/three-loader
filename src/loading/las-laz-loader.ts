@@ -224,15 +224,15 @@ export class LasLazLoader {
         const pointSourceIDs = new Uint16Array(e.data.pointSourceID);
         const indices = new Uint8Array(e.data.indices);
 
-        geometry.addAttribute('position', new BufferAttribute(positions, 3));
-        geometry.addAttribute('color', new BufferAttribute(colors, 4, true));
-        geometry.addAttribute('intensity', new BufferAttribute(intensities, 1));
-        geometry.addAttribute('classification', new BufferAttribute(classifications, 1));
-        geometry.addAttribute('returnNumber', new BufferAttribute(returnNumbers, 1));
-        geometry.addAttribute('numberOfReturns', new BufferAttribute(numberOfReturns, 1));
-        geometry.addAttribute('pointSourceID', new BufferAttribute(pointSourceIDs, 1));
-        //geometry.addAttribute('normal', new BufferAttribute(new Float32Array(numPoints * 3), 3));
-        geometry.addAttribute('indices', new BufferAttribute(indices, 4));
+        geometry.setAttribute('position', new BufferAttribute(positions, 3));
+        geometry.setAttribute('color', new BufferAttribute(colors, 4, true));
+        geometry.setAttribute('intensity', new BufferAttribute(intensities, 1));
+        geometry.setAttribute('classification', new BufferAttribute(classifications, 1));
+        geometry.setAttribute('returnNumber', new BufferAttribute(returnNumbers, 1));
+        geometry.setAttribute('numberOfReturns', new BufferAttribute(numberOfReturns, 1));
+        geometry.setAttribute('pointSourceID', new BufferAttribute(pointSourceIDs, 1));
+        //geometry.setAttribute('normal', new BufferAttribute(new Float32Array(numPoints * 3), 3));
+        geometry.setAttribute('indices', new BufferAttribute(indices, 4));
         geometry.attributes.indices.normalized = true;
 
         const tightBoundingBox = new Box3(
